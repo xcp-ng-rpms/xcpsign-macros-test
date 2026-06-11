@@ -1,0 +1,35 @@
+#!/bin/bash
+# Mock replacement for the XenServer fetchcert signing-service client.
+# Usage: fetchcert -c <KEY_NAME> -o <output.cert>
+#
+# Looks up a pre-generated DER cert from XCPSIGN_KEYSTORE (default: /etc/xcpsign/keys)
+# and writes it to the output path, exactly what the real service does.
+
+set -euo pipefail
+
+KEY_NAME=""
+OUTPUT=""
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -c) KEY_NAME="$2"; shift 2 ;;
+        -o) OUTPUT="$2";   shift 2 ;;
+        *)  echo "Unknown arg: $1" >&2; exit 1 ;;
+    esac
+done
+
+[[ -z "$KEY_NAME" ]] && { echo "fetchcert: -c KEY_NAME required" >&2; exit 1; }
+[[ -z "$OUTPUT"   ]] && { echo "fetchcert: -o OUTPUT required"   >&2; exit 1; }
+
+KEYSTORE="${XCPSIGN_KEYSTORE:-/etc/xcpsign/keys}"
+CERT="$KEYSTORE/$KEY_NAME.cer"
+
+if [[ ! -f "$CERT" ]]; then
+    echo "fetchcert: cert not found: $CERT" >&2
+    echo "  Available keys in $KEYSTORE:" >&2
+    ls "$KEYSTORE"/*.cer 2>/dev/null | sed 's|.*/||;s|\.cer||' >&2 || true
+    exit 1
+fi
+
+cp "$CERT" "$OUTPUT"
+echo "fetchcert: wrote $OUTPUT (from $CERT)"

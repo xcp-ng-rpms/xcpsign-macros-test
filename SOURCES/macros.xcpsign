@@ -1,0 +1,23 @@
+# macros.xcpsign, XCP signing macros
+# Installed by: xcpsign-macros
+#
+# These macros replicate the interface of the production xssign-macros package.
+
+# Key store location, override with XCPSIGN_KEYSTORE env var if needed
+%_xcpsign_keystore  /etc/xcpsign/keys
+%_xcpsign_fetchcert /usr/local/bin/fetchcert
+%_xcpsign_sign      /usr/local/bin/xcpsign
+
+# %fetchcert: fetch a signing certificate by key name
+# Usage in spec: %fetchcert -c KEY_NAME -o output.cert
+%fetchcert(c:o:) \
+    XCPSIGN_KEYSTORE=%{_xcpsign_keystore} \
+    %{_xcpsign_fetchcert} -c %{-c*} -o %{-o*} \
+%{nil}
+
+# %sign: sign a PE binary using a named key
+# Usage in spec: %sign -c KEY_NAME -i input -o output
+%sign(c:i:o:) \
+    XCPSIGN_KEYSTORE=%{_xcpsign_keystore} \
+    %{_xcpsign_sign} -c %{-c*} -i %{-i*} -o %{-o*} \
+%{nil}

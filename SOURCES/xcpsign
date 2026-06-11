@@ -1,0 +1,45 @@
+#!/bin/bash
+# Replacement for the XenServer xssign PE-signing client.
+# Usage: xcpsign -c <KEY_NAME> -i <input_binary> -o <output_binary>
+#
+# Signs a PE binary (bzImage/EFI) using sbsign with a locally stored key.
+
+set -euo pipefail
+
+KEY_NAME=""
+INPUT=""
+OUTPUT=""
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -c) KEY_NAME="$2"; shift 2 ;;
+        -i) INPUT="$2";    shift 2 ;;
+        -o) OUTPUT="$2";   shift 2 ;;
+        *)  echo "Unknown arg: $1" >&2; exit 1 ;;
+    esac
+done
+
+[[ -z "$KEY_NAME" ]] && { echo "xcpsign: -c KEY_NAME required" >&2; exit 1; }
+[[ -z "$INPUT"    ]] && { echo "xcpsign: -i INPUT required"    >&2; exit 1; }
+[[ -z "$OUTPUT"   ]] && { echo "xcpsign: -o OUTPUT required"   >&2; exit 1; }
+
+KEYSTORE="${XCP_SIGN_KEYSTORE:-/etc/xcpsign/keys}"
+KEY="$KEYSTORE/$KEY_NAME.key"
+CERT="$KEYSTORE/$KEY_NAME.crt"
+
+for F in "$KEY" "$CERT"; do
+    [[ -f "$F" ]] || { echo "xcpsign: missing file: $F" >&2; exit 1; }
+done
+
+echo "xcpsign: signing $INPUT → $OUTPUT (key: $KEY_NAME)"
+
+sbsign \
+    --key  "$KEY" \
+    --cert "$CERT" \
+    --output "$OUTPUT" \
+    "$INPUT"
+
+# Verify immediately
+sbverify --cert "$CERT" "$OUTPUT" && \
+    echo "xcpsign: ✓ signature verified" || \
+    { echo "xcpsign: ✗ signature verification FAILED" >&2; exit 1; }
