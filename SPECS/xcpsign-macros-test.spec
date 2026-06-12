@@ -1,6 +1,6 @@
 Name:    xcpsign-macros-test
 Version: 1.0
-Release: 0.cop.1
+Release: 0.cop.1%{dist}
 Summary: Local signing macros for XCP-ng kernel build testing
 License: MIT
 BuildArch: noarch
@@ -9,10 +9,36 @@ BuildArch: noarch
 # No dependencies, sbsign is pulled in by the kernel spec itself
 # or pre-installed in the build container.
 
+Source0:  macros.xcpsign
+Source1:  fetchcert
+Source2:  xcpsign
+Source3:  LINUX_SIGN_KEY_XCP9.key
+Source4:  LINUX_SIGN_KEY_XCP9.crt
+Source5:  LINUX_SIGN_KEY_XCP9.cer
+Source6:  GRUB_SIGN_KEY_XCP9.key
+Source7:  GRUB_SIGN_KEY_XCP9.crt
+Source8:  GRUB_SIGN_KEY_XCP9.cer
+Source9:  XEN_SIGN_KEY_XCP9.key
+Source10: XEN_SIGN_KEY_XCP9.crt
+Source11: XEN_SIGN_KEY_XCP9.cer
+Source12: LINUX_EXT_SIGN_KEY_XCP9.key
+Source13: LINUX_EXT_SIGN_KEY_XCP9.crt
+Source14: LINUX_EXT_SIGN_KEY_XCP9.cer
+Source15: LINUX_THIRD_PARTY_SIGN_KEY_XCP9.key
+Source16: LINUX_THIRD_PARTY_SIGN_KEY_XCP9.crt
+Source17: LINUX_THIRD_PARTY_SIGN_KEY_XCP9.cer
+Source18: SHIM_SIGN_KEY_XCP9.key
+Source19: SHIM_SIGN_KEY_XCP9.crt
+Source20: SHIM_SIGN_KEY_XCP9.cer
+Source21: SHIM_EMBEDDED_SIGN_KEY_XCP9.key
+Source22: SHIM_EMBEDDED_SIGN_KEY_XCP9.crt
+Source23: SHIM_EMBEDDED_SIGN_KEY_XCP9.cer
+
 %description
 Local replacement for the production xcpsign-macros package.
 Provides %%fetchcert and %%sign RPM macros that use locally stored
 test keys instead of the production signing service.
+
 
 %install
 install -D -m 644 %{_sourcedir}/macros.xcpsign \
