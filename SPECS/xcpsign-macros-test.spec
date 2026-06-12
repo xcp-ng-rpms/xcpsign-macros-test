@@ -1,6 +1,6 @@
 Name:    xcpsign-macros-test
 Version: 1.0
-Release: 0.cop.1
+Release: 0.cop.1%{dist}
 Summary: Local signing macros for XCP-ng kernel build testing
 License: MIT
 BuildArch: noarch
